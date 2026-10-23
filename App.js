@@ -10,7 +10,8 @@ const LESSON_SIZE = 5;
 const QUIZ_SIZE = 5;
 const emptyProgress = { completed: {}, bestScores: {}, lastDailyDate: null, streak: 0 };
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const localKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const todayKey = () => localKey(new Date());
 const dayNumber = () => Math.floor(new Date(todayKey()).getTime() / 86400000);
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 const speak = (text) => Speech.speak(text, { language: 'es-ES', rate: 0.85 });
@@ -58,7 +59,7 @@ export default function App() {
     if (lesson.id === 'daily') {
       const t = todayKey();
       if (progress.lastDailyDate !== t) {
-        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        const yesterday = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return localKey(d); })();
         next.streak = progress.lastDailyDate === yesterday ? progress.streak + 1 : 1;
         next.lastDailyDate = t;
       }
